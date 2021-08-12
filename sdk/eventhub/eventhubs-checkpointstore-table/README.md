@@ -94,21 +94,21 @@ In this example, `SubscriptionHandlers` implements [SubscriptionEventHandlers](h
 
 ```javascript
 const { EventHubConsumerClient } = require("@azure/event-hubs");
-const { TableClient } = require("@azure/data-tables");
+const { TableClient,AzureNamedKeyCredentia } = require("@azure/data-tables");
 const { TableCheckpointStore } = require("@azure/eventhubs-checkpointstore-table");
 
-const storageAccountConnectionString = "storage-account-connection-string";
+const account = "account name";
+const accountKey = "account-key";
 const tableName = "table-name";
 const eventHubConnectionString = "eventhub-connection-string";
 const consumerGroup = "my-consumer-group";
 const eventHubName = "eventHubName";
 
 async function main() {
-  const tableClient = new TableClient(storageAccountConnectionString, tableName);
 
-  if (!(await tableClient.exists())) {
-    await tableClient.create();
-  }
+  const credential = new AzureNamedKeyCredential(account, accountKey);
+  const tableClient = new TableClient(`https://${account}.table.core.windows.net`, tableName, credential);
+ 
 
   const checkpointStore = new TableCheckpointStore(tableClient);
   const consumerClient = new EventHubConsumerClient(
